@@ -1,0 +1,29 @@
+name: Auto Daily Commit
+
+on:
+  schedule:
+    # Berjalan otomatis setiap hari pukul 00:00 UTC (07:00 WIB)
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Memungkinkan kamu menjalankan bot secara manual
+
+jobs:
+  auto-commit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update daily log
+        run: |
+          echo "Last active: $(date)" >> activity.txt
+
+      - name: Commit and Push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add activity.txt
+          git commit -m "chore: daily activity update [skip ci]" || exit 0
+          git push
